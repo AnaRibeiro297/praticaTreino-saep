@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Agendamentos - SAEP</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <h1>Agendamentos</h1>
+    <nav>
+      <a href="principal.html">Início</a>
+      <a href="clientes.html">Clientes</a>
+      <a href="veiculos.html">Veículos</a>
+      <a href="agendamentos.html">Agendamentos</a>
+      <button class="btn-danger" onclick="logout()">Sair</button>
+    </nav>
+  </header>
+
+  <div class="card">
+    <h3>Novo Agendamento</h3>
+    <select id="veiculo_id">
+      <option value="">Selecione o Veículo</option>
+    </select>
+    <input type="datetime-local" id="data">
+    <input type="text" id="descricao" placeholder="Descrição dos serviços">
+    <button onclick="salvarAgendamento()">Agendar Serviço</button>
+  </div>
+
+  <div class="card">
+    <h3>Lista de Agendamentos (Ordenados por Data)</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Data/Hora</th>
+          <th>Descrição</th>
+          <th>Veículo</th>
+          <th>Cliente</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody id="lista-agendamentos"></tbody>
+    </table>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script>
+    async function carregarOpcoesVeiculos() {
+      const res = await fetch(`${API_URL}/veiculos`, { headers: getHeaders() });
+      const veiculos = await res.json();
+      const select = document.getElementById('veiculo_id');
+      select.innerHTML = '<option value="">Selecione o Veículo</option>';
+      veiculos.forEach(v => {
+        select.innerHTML += `<option value="${v.id}">${v.modelo} - Placa: ${v.placa}</option>`;
+      });
+    }
+
+    async function carregarAgendamentos() {
+      const res = await fetch(`${API_URL}/agendamentos`, { headers: getHeaders() });
+      const agendamentos = await res.json();
+      const tbody = document.getElementById('lista-agendamentos');
+      tbody.innerHTML = '';
+      
+      agendamentos.forEach(a => {
+        const nomeCliente = a.cliente ? a.cliente.nome : 'N/A';
+        const modeloVeiculo = a.veiculo ? `${a.veiculo.modelo} (${a.veiculo.placa})` : 'N/A';
+        
+        tbody.innerHTML += `
+          <tr>
+            <td>${a.id}</td>
+            <td>${new Date(a.data).toLocaleString('pt-BR')}</td>
+            <td>${a.descricao}</td>
+            <td>${modeloVeiculo}</td>
+            <td>${nomeCliente}</td>
+            <td>
+              <button onclick="alterarData(${a.id})">Editar Data</button>
+              <button class="btn-danger" onclick="deletarAgendamento(${a.id})">Excluir</button>
+            </td>
+          </tr>`;
+      });
+    }
+
+    async function salvarAgendamento() {
+      const veiculo_id = document.getElementById('veiculo_id').value;
+      const data = document.getElementById('data').value;
+      const descricao = document.getElementById('descricao').value;
+
+      if (!veiculo_id || !data) return alert('Selecione o veículo e a data!');
+
+      const res = await fetch(`${API_URL}/agendamentos`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({ veiculo_id, data, descricao })
+      });
+
+      if (res.ok) {
+        document.getElementById('descricao').value = '';
+        carregarAgendamentos();
+      }
+    }
+
+    async function alterarData(id) {
+      const novaData = prompt('Digite a nova data e hora (Ex: YYYY-MM-DDTHH:mm):');
+      if (!novaData) return;
+
+      const res = await fetch(`${API_URL}/agendamentos/${id}`, {
+        method: 'PUT',
+        headers: getHeaders(),
+        body: JSON.stringify({ data: novaData })
+      });
+
+      if (res.ok) carregarAgendamentos();
+    }
+
+    async function deletarAgendamento(id) {
+      if (!confirm('Deseja excluir este agendamento?')) return;
+      await fetch(`${API_URL}/agendamentos/${id}`, { method: 'DELETE', headers: getHeaders() });
+      carregarAgendamentos();
+    }
+
+    carregarOpcoesVeiculos();
+    carregarAgendamentos();
+  </script>
+</body>
+</html>

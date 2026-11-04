@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Login - SAEP</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body style="display: flex; justify-content: center; align-items: center; min-height: 90vh;">
+
+  <div class="card" style="width: 100%; max-width: 350px;">
+    <h2>Login do Sistema</h2>
+    <input type="text" id="usuario" placeholder="Usuário (admin)">
+    <input type="password" id="senha" placeholder="Senha (123456)">
+    <button onclick="fazerLogin()">Entrar</button>
+    <p id="erro" style="color:red; margin-top:10px;"></p>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script>
+    async function fazerLogin() {
+      const usuario = document.getElementById('usuario').value;
+      const senha = document.getElementById('senha').value;
+
+      try {
+        const response = await fetch(`${API_URL}/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ usuario, senha })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('nome', data.nome);
+          window.location.href = 'principal.html';
+        } else {
+          document.getElementById('erro').innerText = data.mensagem || 'Credenciais inválidas';
+        }
+      } catch (e) {
+        document.getElementById('erro').innerText = 'Erro ao conectar com a API';
+      }
+    }
+  </script>
+</body>
+</html>

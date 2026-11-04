@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Painel Principal - SAEP</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <h1>Oficina SAEP</h1>
+    <nav>
+      <a href="principal.html">Início</a>
+      <a href="clientes.html">Clientes</a>
+      <a href="veiculos.html">Veículos</a>
+      <a href="agendamentos.html">Agendamentos</a>
+      <button class="btn-danger" onclick="logout()">Sair</button>
+    </nav>
+  </header>
+
+  <div class="card">
+    <h2 id="boas-vindas">Bem-vindo!</h2>
+    <p style="margin-top: 10px;">Selecione um dos módulos no menu superior para gerenciar os dados do sistema.</p>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script>
+    document.getElementById('boas-vindas').innerText = `Bem-vindo, ${localStorage.getItem('nome') || 'Usuário'}!`;
+  </script>
+</body>
+</html>
