@@ -22,6 +22,7 @@
     <input type="text" id="nome" placeholder="Nome Completo">
     <input type="text" id="cpf" placeholder="CPF">
     <input type="text" id="telefone" placeholder="Telefone">
+    <input type="text" id="email" placeholder="Email">
     <button onclick="salvarCliente()">Cadastrar Cliente</button>
   </div>
 
@@ -53,6 +54,7 @@
             <td>${c.id}</td>
             <td>${c.nome}</td>
             <td>${c.cpf}</td>
+            <td>${c.email || '-'}</td>
             <td>${c.telefone || '-'}</td>
             <td><button class="btn-danger" onclick="deletarCliente(${c.id})">Excluir</button></td>
           </tr>`;
@@ -63,6 +65,7 @@
       const nome = document.getElementById('nome').value;
       const cpf = document.getElementById('cpf').value;
       const telefone = document.getElementById('telefone').value;
+      const email = document.getElementById('email').value;
 
       const res = await fetch(`${API_URL}/clientes`, {
         method: 'POST',
@@ -74,6 +77,7 @@
         document.getElementById('nome').value = '';
         document.getElementById('cpf').value = '';
         document.getElementById('telefone').value = '';
+        document.getElementById('email').value = '';
         carregarClientes();
       }
     }
