@@ -44,9 +44,6 @@ app.use((req, res, next) => {
 const host = process.env.HOST || 'localhost';
 const port = process.env.PORT || 3000;
 
-// =========================================================================
-// FUNÇÕES AUXILIARES
-// =========================================================================
 function mostrar(tela, dados = {}) {
     const caminho = path.join(__dirname, 'views', `${tela}.html`);
     let html = fs.readFileSync(caminho, 'utf8');
@@ -59,7 +56,6 @@ function mostrar(tela, dados = {}) {
     return html;
 }
 
-// Chave de 32 bytes para AES-256 (defina CRYPTO_KEY no seu .env)
 const CHAVE_CRYPTO = crypto
     .createHash('sha256')
     .update(String(process.env.CRYPTO_KEY || 'chave_secreta_padrao_32_bytes_123'))
@@ -88,9 +84,9 @@ function descriptografarCPF(textoCriptografado) {
     }
 }
 
-// =========================================================================
+
 // ROTAS PÚBLICAS (Antes do middleware de autenticação JWT)
-// =========================================================================
+
 app.get('/', (req, res) => {
     res.send(mostrar('index', { erro: '' }));
 });
@@ -125,9 +121,9 @@ app.post('/sair', (req, res) => {
     res.redirect('/');
 });
 
-// =========================================================================
+
 // MIDDLEWARE DE PROTEÇÃO (Exige login válido para todas as rotas abaixo)
-// =========================================================================
+
 app.use((req, res, next) => {
     try {
         req.usuario = jwt.verify(req.cookies.token, process.env.JWT_SECRET);
@@ -137,16 +133,15 @@ app.use((req, res, next) => {
     }
 });
 
-// =========================================================================
 // TELA PRINCIPAL
-// =========================================================================
+
 app.get('/principal', (req, res) => {
     res.send(mostrar('principal', { nome: req.usuario.nome }));
 });
 
-// =========================================================================
+
 // CRUD DE CLIENTES
-// =========================================================================
+
 app.get('/clientes', async (req, res) => {
     try {
         const busca = req.query.busca || '';
@@ -213,9 +208,8 @@ app.delete('/clientes/:id', async (req, res) => {
     }
 });
 
-// =========================================================================
 // CRUD DE VEÍCULOS
-// =========================================================================
+
 app.get('/veiculos', async (req, res) => {
     try {
         const busca = req.query.busca || '';
@@ -277,9 +271,9 @@ app.delete('/veiculos/:id', async (req, res) => {
     }
 });
 
-// =========================================================================
+
 // CRUD DE AGENDAMENTOS
-// =========================================================================
+
 app.get('/agendamentos', async (req, res) => {
     try {
         const busca = req.query.busca || '';
@@ -341,9 +335,8 @@ app.delete('/agendamentos/:id', async (req, res) => {
     }
 });
 
-// =========================================================================
 // INICIALIZAÇÃO DO SERVIDOR
-// =========================================================================
+
 app.listen(port, host, () => {
     console.log(`Servidor rodando em http://${host}:${port}`);
 });
